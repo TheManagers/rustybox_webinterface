@@ -1,0 +1,51 @@
+{{#*inline "title"}}
+  Feed - Team
+{{/inline}}
+{{#*inline "page"}}
+  <h2 class="page-title">Feed</h2>
+  <ul class="post-items">
+  {{#each feeds}}
+    <li>
+      <div class="feed-item">
+        <div class="feed-user-icon">
+        <a href="/{{user.username}}">
+          {{#if user.icon_url}}
+            <img src="{{user.icon_url}}" class="feed-user-icon-img">
+          {{else}}
+            <canvas width="30" height="30" data-jdenticon-hash="{{user.username_hash}}" class="feed-user-icon-img"></canvas>
+          {{/if}}
+        </a>
+        </div>
+
+        <div class="feed-post">
+          {{#if comment}}
+            <div class="feed-item-detail">
+              @{{user.username}} commented on <a href="/{{kind}}/show/{{id}}">{{title}}</a>
+            </div>
+            <div class="feed-comment">" {{body}} "</div>
+          {{/if}}
+          {{#if post}}
+            <div class="feed-item-detail">
+              @{{user.username}} created new post
+            </div>
+            <div class="feed-comment"><a href="/{{kind}}/show/{{id}}">{{title}}</a></div>
+          {{/if}}
+          {{#if gist}}
+            <div class="feed-item-detail">
+              @{{user.username}} created new gist
+            </div>
+            <div class="feed-comment"><a href="/gist/show/{{id}}">{{title}}</a></div>
+          {{/if}}
+        </div>
+
+      </div>
+    </li>
+  {{/each}}
+  </ul>
+  <div class="paginates">
+    <a href="/?page={{prev_page}}">Previous</a>
+    {{current_page}} of {{total_page}}
+    <a href="/?page={{next_page}}">Next</a>
+  </div>
+{{/inline}}
+{{~> layout ~}}
