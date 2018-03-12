@@ -1,14 +1,24 @@
-/*
-use postgres::error::Error;
-use db;
-use helper;
 
+//use std::error::Error;
+use db;
+//use helper;
+use redis;
+use redis::Commands;
+
+pub fn create(conn: &db::RedisConnection, username: &String, password: &String) -> redis::RedisResult<()> {
+    //let rows = &conn.query("INSERT INTO users (username, password) VALUES ($1, $2) returning id;", &[&username, &password]).unwrap();
+    //let row = rows.get(0);
+    //let user_id: i32 = row.get("id");
+    let key = format!("{}{}", "user:", username);
+    let _ : () = try!(conn.set(key, password));
+    Ok(())
+}
+
+/*
 #[derive(Serialize, Debug, Default)]
 pub struct User {
-    pub id: i32,
     pub username: String,
-    pub icon_url: Option<String>,
-    pub username_hash: String,
+    pub password: String,
 }
 
 #[derive(Serialize, Debug, Default)]

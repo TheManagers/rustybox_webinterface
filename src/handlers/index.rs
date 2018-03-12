@@ -1,21 +1,38 @@
-use persistent;
+//use persistent;
 use iron::prelude::*;
 use iron::status;
-use iron::modifiers::Redirect;
+//use iron::modifiers::Redirect;
 use hbs::Template;
 use hbs::handlebars::to_json;
 
+use persistent::Read as PRead;
+
 use db;
 use models;
-use handlers;
-use helper;
+//use handlers;
+//use helper;
 
 const PAGINATES_PER: i32 = 10;
 
 
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
+    let conn = get_redis_connection!(req);
+    let result: i32;
+    let username = "John".to_string();
+    let password = "mysecret".to_string();
+    match models::user::create(&conn, &username, &password) {
+        Ok(_) => {
+            result = 1;
+        }
+        Err(e) => {
+            error!("Errored: {:?}", e);
+            return Ok(Response::with((status::InternalServerError)));
+        }
+    }
+
     #[derive(Serialize, Debug)]
     struct Data {
+        success: i32,
         logged_in: bool,
         //login_user: models::user::User,
         //feeds: Vec<models::post::Feed>,
@@ -25,9 +42,10 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
         prev_page: i32,
     }
     let data = Data {
+        success: result,
         logged_in: true,
         current_page: 1,
-        total_page: 10,
+        total_page: PAGINATES_PER,
         next_page: 2,
         prev_page: 0,
     };

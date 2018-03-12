@@ -12,7 +12,7 @@ impl Key for Redis {
 }
 
 macro_rules! get_redis_connection {
-    ($req:expr) => (match $req.get::<persistent::Read<db::PostgresDB>>() {
+    ($req:expr) => (match $req.get::<PRead<db::Redis>>() {
         Ok(pool) => match pool.get() {
             Ok(conn) => conn,
             Err(_) => {

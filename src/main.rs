@@ -47,12 +47,12 @@ extern crate oauth2;
 extern crate reqwest;
 
 use std::error::Error;
-use std::path::Path;
+//use std::path::Path;
 
 use iron::prelude::*;
 use router::Router;
 use hbs::{HandlebarsEngine, DirectorySource};
-use staticfile::Static;
+//use staticfile::Static;
 use mount::Mount;
 
 use iron_sessionstorage::SessionStorage;
@@ -136,8 +136,6 @@ fn main() {
         panic!("{}", r.description());
     }
     chain.link_after(hbse);
-    println!("Init Redis");
-    //TODO
     match db::get_pool(&env::CONFIG.team_database_url.as_str()) {
         Ok(pool) => chain.link(persistent::Read::<db::Redis>::both(pool)),
         Err(err) => {
