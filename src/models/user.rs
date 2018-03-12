@@ -5,12 +5,18 @@ use db;
 use redis;
 use redis::Commands;
 
-pub fn create(conn: &db::RedisConnection, username: &String, password: &String) -> redis::RedisResult<()> {
-    //let rows = &conn.query("INSERT INTO users (username, password) VALUES ($1, $2) returning id;", &[&username, &password]).unwrap();
-    //let row = rows.get(0);
-    //let user_id: i32 = row.get("id");
-    let key = format!("{}{}", "user:", username);
-    let _ : () = try!(conn.set(key, password));
+const USER_PREFIX: &'static str = "user:";
+
+#[derive(Serialize, Debug, Default)]
+pub struct User {
+    pub username: String,
+    pub password: String,
+    pub hash: Option<String>
+}
+
+pub fn create(conn: &db::RedisConnection, user: &User) -> redis::RedisResult<()> {
+    let key = format!("{}{}", USER_PREFIX, &user.username);
+    let _t : () = try!(conn.set(key, &user.password));
     Ok(())
 }
 

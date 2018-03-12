@@ -14,13 +14,17 @@ use models;
 
 const PAGINATES_PER: i32 = 10;
 
-
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     let conn = get_redis_connection!(req);
     let result: i32;
-    let username = "John".to_string();
-    let password = "mysecret".to_string();
-    match models::user::create(&conn, &username, &password) {
+
+    let user = models::user::User {
+        username: String::from("John"),
+        password: "mysecret".to_string(),
+        hash: Some("theHASH".to_string())
+    };
+
+    match models::user::create(&conn, &user) {
         Ok(_) => {
             result = 1;
         }
@@ -34,7 +38,7 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     struct Data {
         success: i32,
         logged_in: bool,
-        //login_user: models::user::User,
+        login_user: models::user::User,
         //feeds: Vec<models::post::Feed>,
         current_page: i32,
         total_page: i32,
@@ -44,6 +48,7 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     let data = Data {
         success: result,
         logged_in: true,
+        login_user: user,
         current_page: 1,
         total_page: PAGINATES_PER,
         next_page: 2,
