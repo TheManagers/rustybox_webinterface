@@ -16,10 +16,11 @@ url = "1.0"
 oauth2 = "1.2.1"
 reqwest = "0.6.0"
 
-postgres = { version = "0.14.1", features = ["with-chrono"] }
+#postgres = { version = "0.14.1", features = ["with-chrono"] }
+redis = "0.8.0"
+r2d2 = "0.8"
 
-r2d2 = "0.7.2"
-r2d2_postgres = "0.12.0"
+r2d2_redis = "0.7.0"
 
 handlebars-iron = "0.24.1"
 

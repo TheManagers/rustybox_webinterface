@@ -15,7 +15,7 @@ fn default_empty_string() -> String {
 }
 
 fn default_database_url() -> String {
-    String::from("postgres://root:@postgres:5432/team")
+    String::from("redis://localhost")
 }
 
 #[derive(Deserialize, Debug)]

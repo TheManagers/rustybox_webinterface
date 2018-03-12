@@ -10,9 +10,9 @@ extern crate persistent;
 extern crate iron_sessionstorage;
 extern crate urlencoded;
 
-extern crate postgres;
+extern crate redis;
 extern crate r2d2;
-extern crate r2d2_postgres;
+extern crate r2d2_redis;
 
 extern crate serde;
 extern crate serde_json;
@@ -54,7 +54,6 @@ use router::Router;
 use hbs::{HandlebarsEngine, DirectorySource};
 use staticfile::Static;
 use mount::Mount;
-use persistent::Read as PRead;
 
 use iron_sessionstorage::SessionStorage;
 use iron_sessionstorage::backends::SignedCookieBackend;
@@ -137,14 +136,15 @@ fn main() {
         panic!("{}", r.description());
     }
     chain.link_after(hbse);
-
-    /*match db::get_pool(&env::CONFIG.team_database_url.as_str()) {
-        Ok(pool) => chain.link(PRead::<db::PostgresDB>::both(pool)),
+    println!("Init Redis");
+    //TODO
+    match db::get_pool(&env::CONFIG.team_database_url.as_str()) {
+        Ok(pool) => chain.link(persistent::Read::<db::Redis>::both(pool)),
         Err(err) => {
-            error!("postgres: {}", err);
+            error!("Redis: {}", err);
             std::process::exit(-1);
         }
-    };*/
+    };
 
     let secret = b"FLEo9NZJDhZbBaT".to_vec();
     chain.link_around(SessionStorage::new(SignedCookieBackend::new(secret)));
