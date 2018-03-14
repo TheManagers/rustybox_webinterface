@@ -23,7 +23,6 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
         password: "mysecret".to_string(),
         hash: Some("theHASH".to_string())
     };
-
     match models::user::create(&conn, &user) {
         Ok(_) => {
             result = 1;
@@ -33,6 +32,27 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
             return Ok(Response::with((status::InternalServerError)));
         }
     }
+
+    models::device::get_all(&conn);
+
+
+    let device = models::device::Device {
+        appname: String::from("opus21"),
+        name: String::from("meinDevice"),
+        description: String::from("Hallo ich bin die Beschreibung"),
+        id: 1,
+        active: true
+    };
+
+    match models::device::create(&conn, &device) {
+        Ok(_) => {}
+        Err(e) => {
+            error!("Errored: {:?}", e);
+            return Ok(Response::with((status::InternalServerError)));
+        }
+    }
+    
+
 
     #[derive(Serialize, Debug)]
     struct Data {

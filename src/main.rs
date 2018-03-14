@@ -110,13 +110,14 @@ fn setup_fern(level: log::LogLevelFilter, verbose: bool) {
         })
         .level(level)
         .chain(std::io::stdout())
-        .filter(move |meta: &log::LogMetadata| verbose || meta.target().starts_with("team"))
+        //.chain(fern::log_file("output.log"))
+        //.filter(move |meta: &log::LogMetadata| verbose || meta.target().starts_with("team"))
         .apply()
         .unwrap()
 }
 
 fn main() {
-    setup_fern(log::LogLevelFilter::Debug, false);
+    setup_fern(log::LogLevelFilter::Error, false);
     let router = handlers::router::create_router();
 
     let mut mount = Mount::new();
