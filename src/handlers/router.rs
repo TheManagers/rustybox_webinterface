@@ -7,6 +7,8 @@ use handlers::gist;*/
 pub fn create_router() -> Router {
     let mut router = Router::new();
     router.get("/", index::index_handler, "index");
+    router.get("/newapp", index::newapp_handler, "newapp");
+    router.post("/upload", index::upload_handler, "upload");
     /*router.get("/search", index::search_handler, "search");
     router.get("/tag", index::tag_handler, "tag");
 

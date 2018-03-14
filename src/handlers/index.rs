@@ -1,6 +1,8 @@
 //use persistent;
 use iron::prelude::*;
 use iron::status;
+use params::{Params, Value};
+
 //use iron::modifiers::Redirect;
 use hbs::Template;
 use hbs::handlebars::to_json;
@@ -14,6 +16,9 @@ use db;
 use models;
 
 use wither::Model;
+
+use std::fs;
+use std::env;
 //use handlers;
 //use helper;
 
@@ -96,6 +101,54 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     };
     let mut resp = Response::new();
     resp.set_mut(Template::new("index", to_json(&data)))
+        .set_mut(status::Ok);
+    return Ok(resp);
+}
+
+pub fn newapp_handler(req: &mut Request) -> IronResult<Response> {
+    let conn = get_mongodb_connection!(req);
+
+    let mut resp = Response::new();
+    resp.set_mut(Template::new("newapp", ()))
+        .set_mut(status::Ok);
+    return Ok(resp);
+}
+
+pub fn upload_handler(req: &mut Request) -> IronResult<Response> {
+    let conn = get_mongodb_connection!(req);
+    //let params = req.get_ref::<Params>().unwrap();
+    println!("{:?}", req.get_ref::<Params>());
+    match req.get_ref::<Params>().unwrap().find(&["file"]) {
+        Some(&Value::File(ref file)) => {
+            use std::io::Read;
+            use std::io::Write;
+            use std::fs::File;
+            use std::fs::create_dir;
+            use std::path::PathBuf;
+            // rename funkioniert nicht: { repr: Os { code: 18, message: "Invalid cross-device link" } }
+            //fs::rename(&file.path, "/home/jonas/testfile").expect("Geht nicht");
+            //println!("{:?}", file.path);
+            let mut myfile = file.open().expect("Panik");
+            let mut buffer = Vec::new();
+            myfile.read_to_end(&mut buffer).expect("File panik");
+            
+
+            let bin = env::current_exe().expect("exe path");
+            let mut target_dir = PathBuf::from(bin.parent().expect("bin parent"));
+            target_dir.push("apps");
+            if target_dir.is_dir() == false {
+                create_dir(&target_dir);
+            }
+            target_dir.push("myapp.txt");
+            let mut newfile = File::create(&target_dir).expect("File no save");
+            newfile.write_all(&buffer).expect("no save");
+        }
+        _ => {
+            println!("no file");
+        }
+    }
+    let mut resp = Response::new();
+    resp.set_mut(Template::new("upload", ()))
         .set_mut(status::Ok);
     return Ok(resp);
 }

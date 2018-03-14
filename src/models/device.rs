@@ -28,6 +28,8 @@ impl<'a> wither::Model<'a> for Device {
         self.id = Some(oid);
     }
 
+    // TODO: Index richtig einstellen
+    /*
     fn indexes() -> Vec<IndexModel> {
         return vec![
             IndexModel{
@@ -36,4 +38,5 @@ impl<'a> wither::Model<'a> for Device {
             },
         ];
     }
+    */
 }
