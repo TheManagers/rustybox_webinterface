@@ -7,23 +7,43 @@ use hbs::handlebars::to_json;
 
 use persistent::Read as PRead;
 
+use bson;
+
+use mongodb::{Client, ThreadedClient};
 use db;
 use models;
+
+use wither::Model;
 //use handlers;
 //use helper;
 
 const PAGINATES_PER: i32 = 10;
 
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
-    let conn = get_redis_connection!(req);
+    let conn = get_mongodb_connection!(req);
     let result: i32;
 
-    let user = models::user::User {
+    /*let user = models::user::User {
         username: String::from("John"),
         password: "mysecret".to_string(),
         hash: Some("theHASH".to_string())
+    };*/
+
+    let mut device = models::device::Device {
+        id: None,
+        appname: String::from("opus21"),
+        name: String::from("meinDevice"),
+        description: String::from("Hallo ich bin die Beschreibung"),
+        active: true
     };
-    match models::user::create(&conn, &user) {
+    //let sDevice = bson::to_bson(&device)?;  // Serialize
+    //if let bson::Bson::Document(document) = sDevice {
+        device.save(conn.clone().db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
+    //} else {
+        //println!("Error converting the BSON object into a MongoDB document");
+    //}
+    
+    /*match models::user::create(&conn, &user) {
         Ok(_) => {
             result = 1;
         }
@@ -50,15 +70,15 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
             error!("Errored: {:?}", e);
             return Ok(Response::with((status::InternalServerError)));
         }
-    }
+    }*/
     
 
 
     #[derive(Serialize, Debug)]
     struct Data {
-        success: i32,
+        //success: i32,
         logged_in: bool,
-        login_user: models::user::User,
+        //login_user: models::user::User,
         //feeds: Vec<models::post::Feed>,
         current_page: i32,
         total_page: i32,
@@ -66,9 +86,9 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
         prev_page: i32,
     }
     let data = Data {
-        success: result,
+        //success: result,
         logged_in: true,
-        login_user: user,
+        //login_user: user,
         current_page: 1,
         total_page: PAGINATES_PER,
         next_page: 2,

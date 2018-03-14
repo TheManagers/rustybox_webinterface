@@ -1,34 +1,34 @@
 use std::error::Error;
 use r2d2;
-use r2d2_redis::{RedisConnectionManager};
+use r2d2_mongodb::{MongodbConnectionManager};
 use iron::typemap::Key;
 
-pub type RedisPool = r2d2::Pool<RedisConnectionManager>;
-pub type RedisConnection = r2d2::PooledConnection<RedisConnectionManager>;
+pub type MongodbPool = r2d2::Pool<MongodbConnectionManager>;
+pub type MongodbConnection = r2d2::PooledConnection<MongodbConnectionManager>;
 
-pub struct Redis;
-impl Key for Redis {
-    type Value = RedisPool;
+pub struct Mongodb;
+impl Key for Mongodb {
+    type Value = MongodbPool;
 }
 
-macro_rules! get_redis_connection {
-    ($req:expr) => (match $req.get::<PRead<db::Redis>>() {
+macro_rules! get_mongodb_connection {
+    ($req:expr) => (match $req.get::<PRead<db::Mongodb>>() {
         Ok(pool) => match pool.get() {
             Ok(conn) => conn,
             Err(_) => {
-                error!("Couldn't get a connection to redis!");
+                error!("Couldn't get a connection to Mongo!");
                 return Ok(Response::with((status::InternalServerError)));
             }
         },
         Err(_) => {
-            error!("Couldn't get the redis pool from the request!");
+            error!("Couldn't get the Mongo pool from the request!");
             return Ok(Response::with((status::InternalServerError)));
         }
     })
 }
 
-pub fn get_pool(uri: &str) -> Result<RedisPool, Box<Error>> {
-    let manager = RedisConnectionManager::new(uri).unwrap();
+pub fn get_pool(host: &str, port: u16) -> Result<MongodbPool, Box<Error>> {
+    let manager = MongodbConnectionManager::new(&host, port).unwrap();
     let pool = r2d2::Pool::builder().build(manager).unwrap();
     Ok(pool)
 }

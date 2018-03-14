@@ -10,9 +10,9 @@ extern crate persistent;
 extern crate iron_sessionstorage;
 extern crate urlencoded;
 
-extern crate redis;
+extern crate mongodb;
 extern crate r2d2;
-extern crate r2d2_redis;
+extern crate r2d2_mongodb;
 
 extern crate serde;
 extern crate serde_json;
@@ -20,6 +20,7 @@ extern crate envy;
 
 #[macro_use]
 extern crate serde_derive;
+extern crate wither;
 
 extern crate crypto;
 
@@ -37,6 +38,10 @@ extern crate tokio_core;
 
 #[macro_use]
 extern crate lazy_static;
+
+#[macro_use(bson, doc)]
+extern crate bson;
+
 
 #[macro_use]
 extern crate log;
@@ -137,10 +142,10 @@ fn main() {
         panic!("{}", r.description());
     }
     chain.link_after(hbse);
-    match db::get_pool(&env::CONFIG.team_database_url.as_str()) {
-        Ok(pool) => chain.link(persistent::Read::<db::Redis>::both(pool)),
+        match db::get_pool(&env::CONFIG.team_database_url.as_str(), env::CONFIG.team_database_port) {
+        Ok(pool) => chain.link(persistent::Read::<db::Mongodb>::both(pool)),
         Err(err) => {
-            error!("Redis: {}", err);
+            error!("MongoDB: {}", err);
             std::process::exit(-1);
         }
     };
