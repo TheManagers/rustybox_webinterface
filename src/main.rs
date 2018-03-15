@@ -25,14 +25,9 @@ extern crate wither;
 
 extern crate crypto;
 
-extern crate slack_hook;
 extern crate time;
 extern crate chrono;
 extern crate diff;
-extern crate hyper;
-extern crate hyper_tls;
-extern crate futures;
-extern crate tokio_core;
 #[macro_use]
 extern crate lazy_static;
 extern crate bson;

@@ -31,18 +31,11 @@ serde_derive = "1.0.7"
 
 rust-crypto = "0.2.36"
 
-slack-hook = "0.6"
-
 time = "0.1"
 
 chrono = { version = "0.3", features = ["serde", "rustc-serialize"] }
 
 diff = "0.1.10"
-
-hyper = "0.11.0"
-hyper-tls = "0.1.1"
-futures = "0.1.14"
-tokio-core = "0.1.8"
 
 log = "0.3"
 fern = "0.4"
