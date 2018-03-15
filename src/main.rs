@@ -26,28 +26,19 @@ extern crate wither;
 extern crate crypto;
 
 extern crate slack_hook;
-
 extern crate time;
 extern crate chrono;
-
 extern crate diff;
-
 extern crate hyper;
 extern crate hyper_tls;
 extern crate futures;
 extern crate tokio_core;
-
 #[macro_use]
 extern crate lazy_static;
-
-#[macro_use(bson, doc)]
 extern crate bson;
-
-
 #[macro_use]
 extern crate log;
 extern crate fern;
-
 extern crate url;
 extern crate oauth2;
 extern crate reqwest;
@@ -117,7 +108,7 @@ fn setup_fern(level: log::LogLevelFilter, verbose: bool) {
         .level(level)
         .chain(std::io::stdout())
         //.chain(fern::log_file("output.log"))
-        //.filter(move |meta: &log::LogMetadata| verbose || meta.target().starts_with("team"))
+        .filter(move |meta: &log::LogMetadata| verbose || meta.target().starts_with("team"))
         .apply()
         .unwrap()
 }

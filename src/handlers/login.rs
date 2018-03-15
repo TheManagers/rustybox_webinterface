@@ -5,8 +5,6 @@ use iron::modifiers::Redirect;
 
 use iron_sessionstorage;
 use iron_sessionstorage::traits::*;
-use iron_sessionstorage::SessionStorage;
-use iron_sessionstorage::backends::SignedCookieBackend;
 
 use urlencoded::UrlEncodedBody;
 

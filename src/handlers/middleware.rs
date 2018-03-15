@@ -1,13 +1,10 @@
-use iron::{Iron, Request, Response, IronResult, BeforeMiddleware, AfterMiddleware, Chain};
+use iron::{Request, Response, IronResult, AfterMiddleware};
 use iron::error::{IronError};
 use iron::status;
-use router::{Router, NoRoute};
+use router::{NoRoute};
 use iron::modifiers::Redirect;
 use iron_sessionstorage::SessionRequestExt;
-use url::Url;
-use iron::Url as IronUrl;
 use handlers::login;
-use helper;
 
 pub struct Custom404;
 #[derive(Clone, Debug)]

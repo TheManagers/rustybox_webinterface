@@ -1,38 +1,28 @@
-//use persistent;
 use iron::prelude::*;
 use iron::status;
 use params::{Params, Value};
 
-//use iron::modifiers::Redirect;
+use mongodb::ThreadedClient;
 use hbs::Template;
 use hbs::handlebars::to_json;
 
 use persistent::Read as PRead;
-
-use bson;
-
-use mongodb::{Client, ThreadedClient};
 use db;
 use models;
-
 use wither::Model;
-
-use std::fs;
 use std::env;
-//use handlers;
-//use helper;
 
 const PAGINATES_PER: i32 = 10;
 
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     let conn = get_mongodb_connection!(req);
-    let result: i32;
 
     /*let user = models::user::User {
         username: String::from("John"),
         password: "mysecret".to_string(),
         hash: Some("theHASH".to_string())
     };*/
+
 
     let mut device = models::device::Device {
         id: None,
@@ -41,42 +31,9 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
         description: String::from("Hallo ich bin die Beschreibung"),
         active: true
     };
-    //let sDevice = bson::to_bson(&device)?;  // Serialize
-    //if let bson::Bson::Document(document) = sDevice {
-        device.save(conn.clone().db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
-    //} else {
-        //println!("Error converting the BSON object into a MongoDB document");
-    //}
-    
-    /*match models::user::create(&conn, &user) {
-        Ok(_) => {
-            result = 1;
-        }
-        Err(e) => {
-            error!("Errored: {:?}", e);
-            return Ok(Response::with((status::InternalServerError)));
-        }
-    }
 
-    models::device::get_all(&conn);
-
-
-    let device = models::device::Device {
-        appname: String::from("opus21"),
-        name: String::from("meinDevice"),
-        description: String::from("Hallo ich bin die Beschreibung"),
-        id: 1,
-        active: true
-    };
-
-    match models::device::create(&conn, &device) {
-        Ok(_) => {}
-        Err(e) => {
-            error!("Errored: {:?}", e);
-            return Ok(Response::with((status::InternalServerError)));
-        }
-    }*/
-    
+    // oder conn.clone().db("rbox") ??
+    device.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
 
 
     #[derive(Serialize, Debug)]
@@ -105,9 +62,7 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     return Ok(resp);
 }
 
-pub fn newapp_handler(req: &mut Request) -> IronResult<Response> {
-    let conn = get_mongodb_connection!(req);
-
+pub fn newapp_handler(_req: &mut Request) -> IronResult<Response> {
     let mut resp = Response::new();
     resp.set_mut(Template::new("newapp", ()))
         .set_mut(status::Ok);
@@ -115,7 +70,6 @@ pub fn newapp_handler(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn upload_handler(req: &mut Request) -> IronResult<Response> {
-    let conn = get_mongodb_connection!(req);
     //let params = req.get_ref::<Params>().unwrap();
     println!("{:?}", req.get_ref::<Params>());
     match req.get_ref::<Params>().unwrap().find(&["file"]) {
@@ -137,7 +91,7 @@ pub fn upload_handler(req: &mut Request) -> IronResult<Response> {
             let mut target_dir = PathBuf::from(bin.parent().expect("bin parent"));
             target_dir.push("apps");
             if target_dir.is_dir() == false {
-                create_dir(&target_dir);
+                create_dir(&target_dir).expect("Could not create dir");
             }
             target_dir.push("myapp.txt");
             let mut newfile = File::create(&target_dir).expect("File no save");

@@ -1,6 +1,5 @@
 use bson;
 use wither;
-use mongodb::coll::options::IndexModel;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Device {

@@ -4,7 +4,6 @@ use r2d2_mongodb::{MongodbConnectionManager};
 use iron::typemap::Key;
 
 pub type MongodbPool = r2d2::Pool<MongodbConnectionManager>;
-pub type MongodbConnection = r2d2::PooledConnection<MongodbConnectionManager>;
 
 pub struct Mongodb;
 impl Key for Mongodb {
