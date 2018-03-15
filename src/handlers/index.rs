@@ -15,29 +15,7 @@ use std::env;
 
 const PAGINATES_PER: i32 = 10;
 
-pub fn index_handler(req: &mut Request) -> IronResult<Response> {
-    let conn = get_mongodb_connection!(req);
-
-    let mut user = models::user::User {
-        id: None,
-        username: String::from("John"),
-        password: helper::encrypt_password("mysecret".to_string()),
-        hash: Some("theHASH".to_string())
-    };
-
-
-    let mut device = models::device::Device {
-        id: None,
-        appname: String::from("opus21"),
-        name: String::from("meinDevice"),
-        description: String::from("Hallo ich bin die Beschreibung"),
-        active: true
-    };
-
-    // oder conn.clone().db("rbox") ??
-    device.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
-    user.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
-
+pub fn index_handler(_req: &mut Request) -> IronResult<Response> {
     #[derive(Serialize, Debug)]
     struct Data {
         //success: i32,
@@ -60,6 +38,35 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     };
     let mut resp = Response::new();
     resp.set_mut(Template::new("index", to_json(&data)))
+        .set_mut(status::Ok);
+    return Ok(resp);
+}
+
+pub fn setup_handler(req: &mut Request) -> IronResult<Response> {
+    let conn = get_mongodb_connection!(req);
+
+    let mut user = models::user::User {
+        id: None,
+        username: String::from("John"),
+        password: helper::encrypt_password("mysecret".to_string()),
+        hash: Some("theHASH".to_string())
+    };
+
+
+    let mut device = models::device::Device {
+        id: None,
+        appname: String::from("opus21"),
+        name: String::from("meinDevice"),
+        description: String::from("Hallo ich bin die Beschreibung"),
+        active: true
+    };
+
+    // oder conn.clone().db("rbox") ??
+    device.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
+    user.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
+
+    let mut resp = Response::new();
+    resp.set_mut(Template::new("setup", ()))
         .set_mut(status::Ok);
     return Ok(resp);
 }
@@ -108,6 +115,8 @@ pub fn upload_handler(req: &mut Request) -> IronResult<Response> {
         .set_mut(status::Ok);
     return Ok(resp);
 }
+
+
 
 /*
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
