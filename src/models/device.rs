@@ -3,7 +3,6 @@ use wither;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Device {
-    /// The device's unique ID.
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<bson::oid::ObjectId>,
     pub appname: String,

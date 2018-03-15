@@ -17,11 +17,12 @@ const PAGINATES_PER: i32 = 10;
 pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     let conn = get_mongodb_connection!(req);
 
-    /*let user = models::user::User {
+    let mut user = models::user::User {
+        id: None,
         username: String::from("John"),
         password: "mysecret".to_string(),
         hash: Some("theHASH".to_string())
-    };*/
+    };
 
 
     let mut device = models::device::Device {
@@ -34,7 +35,7 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
 
     // oder conn.clone().db("rbox") ??
     device.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
-
+    user.save(conn.db("rbox"), None).expect("Expected a successful save operation.");  // Insert into a MongoDB collection
 
     #[derive(Serialize, Debug)]
     struct Data {

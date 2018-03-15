@@ -30,6 +30,7 @@ extern crate chrono;
 extern crate diff;
 #[macro_use]
 extern crate lazy_static;
+#[macro_use(doc, bson)]
 extern crate bson;
 #[macro_use]
 extern crate log;

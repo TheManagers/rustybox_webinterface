@@ -1,12 +1,16 @@
-use iron;
 use iron::prelude::*;
 use iron::status;
 use iron::modifiers::Redirect;
-
 use iron_sessionstorage;
 use iron_sessionstorage::traits::*;
-
 use urlencoded::UrlEncodedBody;
+use hbs::Template;
+use wither::Model;
+use persistent::Read as PRead;
+use mongodb::ThreadedClient;
+
+use models;
+use db;
 
 pub struct Login {
     username: String
@@ -25,54 +29,41 @@ impl iron_sessionstorage::Value for Login {
 }
 
 pub fn login(req: &mut Request) -> IronResult<Response> {
+    // Am i already logged in? 
     if try!(req.session().get::<Login>()).is_some() {
-        // Already logged in
-        return Ok(Response::with((status::Found, Redirect(url_for!(req, "greet")))));
+        // TODO: Redirect to last page user tried to access (Session-Var)
+        return Ok(Response::with((status::Found, Redirect(url_for!(req, "index")))));
     }
 
-    Ok(Response::with((
-        status::Ok,
-        "text/html".parse::<iron::mime::Mime>().unwrap(),
-        format!("This is an insecure demo, so which username do you want to log in as?<br/> \n\
-        <form method=post> \n\
-        <input type=text name=username> \n\
-        <input type=submit> \n\
-        </form>")
-    )))
+    let mut resp = Response::new();
+    resp.set_mut(Template::new("login", ()))
+        .set_mut(status::Ok);
+    Ok(resp)
 }
 
 
 pub fn login_post(req: &mut Request) -> IronResult<Response> {
-    let username = {
+    let conn = get_mongodb_connection!(req);
+    let pusername = {
         let formdata = iexpect!(req.get_ref::<UrlEncodedBody>().ok());
         iexpect!(formdata.get("username"))[0].to_owned()
     };
+    let password = {
+        let formdata = iexpect!(req.get_ref::<UrlEncodedBody>().ok());
+        iexpect!(formdata.get("password"))[0].to_owned()
+    };
+    let user = models::user::User::find_one(conn.db("rbox"),
+            Some(doc!{"username": pusername}),
+            None
+        ).expect("Not successfull lookup")
+        .expect("Not values Found");
 
-    try!(req.session().set(Login { username: username }));
-    Ok(Response::with((status::Found, Redirect(url_for!(req, "greet")))))
+    try!(req.session().set(Login { username: user.username }));
+    
+    Ok(Response::with((status::Found, Redirect(url_for!(req, "index")))))
 }
 
 pub fn logout(req: &mut Request) -> IronResult<Response> {
     try!(req.session().clear());
-    Ok(Response::with((status::Found, Redirect(url_for!(req, "greet")))))
-}
-
-pub fn greet(req: &mut Request) -> IronResult<Response> {
-    let login = iexpect!(
-        req.session().get::<Login>().ok().and_then(|x| x),
-        (
-            status::Unauthorized,
-            "text/html".parse::<iron::mime::Mime>().unwrap(),
-            "<a href=/login>Log in</a>"
-        )
-    );
-
-    Ok(Response::with((
-        status::Ok,
-        "text/html".parse::<iron::mime::Mime>().unwrap(),
-        format!("Hello, {}! <br/>\n\
-        <form method=post action=/logout>\n\
-        <input type=submit value='Log out' />\n\
-        </form>", login.username)
-    )))
+    Ok(Response::with((status::Found, Redirect(url_for!(req, "index")))))
 }
