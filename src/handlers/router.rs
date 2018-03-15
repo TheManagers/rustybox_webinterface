@@ -1,14 +1,22 @@
 use Router;
 use handlers::index;
-/*use handlers::account;
-use handlers::post;
-use handlers::gist;*/
+use handlers::login;
+use handlers::middleware::AuthorizationCheck;
+use handlers::sm::SelectiveMiddleWare2;
 
 pub fn create_router() -> Router {
+    //auth.urls = vec![String::from("/newapp"), String::from("/upload")];
+
     let mut router = Router::new();
     router.get("/", index::index_handler, "index");
-    router.get("/newapp", index::newapp_handler, "newapp");
-    router.post("/upload", index::upload_handler, "upload");
+    router.get("/newapp", SelectiveMiddleWare2::new(index::newapp_handler, vec!(AuthorizationCheck)), "newapp");
+    router.post("/upload", SelectiveMiddleWare2::new(index::upload_handler, vec!(AuthorizationCheck)), "upload");
+    
+    router.get("/greet", login::greet, "greet");
+    router.get("/login", login::login, "login");
+    router.post("/login", login::login_post, "login_post");
+    router.get("/logout", login::logout, "logout");
+
     /*router.get("/search", index::search_handler, "search");
     router.get("/tag", index::tag_handler, "tag");
 

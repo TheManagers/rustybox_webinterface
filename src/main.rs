@@ -1,6 +1,7 @@
 // WebApp Based on https://github.com/rusts/team
-
+#[macro_use]
 extern crate iron;
+#[macro_use]
 extern crate router;
 extern crate handlebars_iron as hbs;
 extern crate params;
@@ -123,6 +124,7 @@ fn setup_fern(level: log::LogLevelFilter, verbose: bool) {
 
 fn main() {
     setup_fern(log::LogLevelFilter::Error, false);
+
     let router = handlers::router::create_router();
 
     let mut mount = Mount::new();
@@ -150,10 +152,11 @@ fn main() {
         }
     };
 
-    let secret = b"FLEo9NZJDhZbBaT".to_vec();
+    let secret = b"FLEo9NCJDhZbBaT".to_vec();
     chain.link_around(SessionStorage::new(SignedCookieBackend::new(secret)));
 
     chain.around(Logger);
+    chain.link_after(handlers::middleware::Custom404);
 
     let listen = format!("{}:{}", "0.0.0.0", &env::CONFIG.port);
     info!("Listen {:?}", listen);
