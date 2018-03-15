@@ -11,6 +11,7 @@ use mongodb::ThreadedClient;
 
 use models;
 use db;
+use helper;
 
 pub struct Login {
     username: String
@@ -43,6 +44,7 @@ pub fn login(req: &mut Request) -> IronResult<Response> {
 
 
 pub fn login_post(req: &mut Request) -> IronResult<Response> {
+    // TODO: Anhand Passwort suchen. User-Password noch hashen.
     let conn = get_mongodb_connection!(req);
     let pusername = {
         let formdata = iexpect!(req.get_ref::<UrlEncodedBody>().ok());
@@ -53,7 +55,7 @@ pub fn login_post(req: &mut Request) -> IronResult<Response> {
         iexpect!(formdata.get("password"))[0].to_owned()
     };
     let user = models::user::User::find_one(conn.db("rbox"),
-            Some(doc!{"username": pusername}),
+            Some(doc!{"username": pusername, "password": helper::encrypt_password(password)}),
             None
         ).expect("Not successfull lookup")
         .expect("Not values Found");

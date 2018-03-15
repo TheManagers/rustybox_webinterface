@@ -1,9 +1,6 @@
 
 use bson;
 use wither;
-//use helper;
-
-const USER_PREFIX: &'static str = "user:";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct User {

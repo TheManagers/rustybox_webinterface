@@ -9,6 +9,7 @@ use hbs::handlebars::to_json;
 use persistent::Read as PRead;
 use db;
 use models;
+use helper;
 use wither::Model;
 use std::env;
 
@@ -20,7 +21,7 @@ pub fn index_handler(req: &mut Request) -> IronResult<Response> {
     let mut user = models::user::User {
         id: None,
         username: String::from("John"),
-        password: "mysecret".to_string(),
+        password: helper::encrypt_password("mysecret".to_string()),
         hash: Some("theHASH".to_string())
     };
 
