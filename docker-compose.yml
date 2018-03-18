@@ -1,0 +1,17 @@
+version: '2.1'
+
+services:
+  rustybox_webinterface:
+    image: rustybox_webinterface
+    build: .
+    ports:
+      - 3000:3000
+    depends_on:
+      - rustybox_db
+    environment:
+      - TEAM_DATABASE_PORT=27017
+      - TEAM_DATABASE_URL=rustybox_db
+    volumes:
+      - .:/app
+  rustybox_db:
+    image: mongo
