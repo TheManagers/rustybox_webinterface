@@ -7,6 +7,7 @@
     <h4>Log in</h4>
      <form action="/login" method="POST">
   <div class="container">
+    {{#if failed}}<p><b>{{errmessage}}</b></p>{{/if}}
     <label for="uname"><b>Username</b></label>
     <input type="text" placeholder="Enter Username" name="username" required>
 

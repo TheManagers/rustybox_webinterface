@@ -43,6 +43,7 @@ fern = "0.4"
 envy = "0.3"
 lazy_static = "0.2.8"
 wither = "0.5.0"
+validator = "0.6.3"
 
 [features]
 integration_tests = []

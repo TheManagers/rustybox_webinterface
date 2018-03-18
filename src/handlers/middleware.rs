@@ -3,8 +3,10 @@ use iron::error::{IronError};
 use iron::status;
 use router::{NoRoute};
 use iron::modifiers::Redirect;
+use iron_sessionstorage;
 use iron_sessionstorage::SessionRequestExt;
 use handlers::login;
+use url::Url;
 
 pub struct Custom404;
 #[derive(Clone, Debug)]
@@ -20,9 +22,27 @@ impl AfterMiddleware for Custom404 {
     }
 }
 
+pub struct TargetUrl {
+    pub url: String
+}
+
+impl iron_sessionstorage::Value for TargetUrl {
+    fn get_key() -> &'static str { "url" }
+    fn into_raw(self) -> String { self.url }
+    fn from_raw(value: String) -> Option<Self> {
+        if value.is_empty() {
+            None
+        } else {
+            Some(TargetUrl { url: value })
+        }
+    }
+}
+
 impl AfterMiddleware for AuthorizationCheck {
     fn after(&self, req: &mut Request, res: Response) -> IronResult<Response> {
         if try!(req.session().get::<login::Login>()).is_none() {
+            let target: Url = req.url.clone().into();
+            req.session().set(TargetUrl {url: String::from(target.as_str())}).expect("Expected: Session write");
             return Ok(Response::with((status::Found, Redirect(url_for!(req, "login")))));
         }
         Ok(res)

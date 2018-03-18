@@ -13,7 +13,7 @@ pub fn create_router() -> Router {
     router.get("/newapp",   SelectiveMiddleWare2::new(index::newapp_handler, vec!(AuthorizationCheck)), "newapp");
     router.post("/upload",  SelectiveMiddleWare2::new(index::upload_handler, vec!(AuthorizationCheck)), "upload");
     router.get("/login",    login::login, "login");
-    router.post("/login",   login::login_post, "login_post");
+    router.post("/login",   login::login, "login_post");
     router.get("/logout",   login::logout, "logout");
 
     return router;
